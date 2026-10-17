@@ -1,7 +1,7 @@
 # Graph Engineering: sistemas multiagente predecibles, observables y listos para escalar
 
 **Charla virtual · Congreso de Informática, Innovación e Investigación · Hospital Italiano de Buenos Aires**
-**25 minutos máx. (objetivo 23:00) · 24 slides · template: `Base presentacion (1).pptx`**
+**25 minutos máx. (objetivo 24:30) · 26 slides · template: `Base presentacion (1).pptx`**
 
 ---
 
@@ -9,7 +9,7 @@
 
 - **Gancho (del copy):** *"Tu agente de IA funcionó perfecto con tu modelo local. En producción, no tanto."*
 - **Tesis:** el problema casi nunca es el modelo, es el sistema que lo rodea. El **harness** lo contiene, el **loop** hace que una unidad de trabajo salga bien sin vos y el **graph** decide qué unidades existen, en qué orden y dónde decide un humano. El modelo es solo un nodo.
-- **Promesa (del copy):** sistemas multiagente **predecibles, observables y listos para escalar**. Cada bloque vuelve a alguno de esos tres adjetivos. **Observable** tiene slide propia (18) y reaparece en el caso Mount Sinai, con su cita sobre el logging.
+- **Promesa (del copy):** sistemas multiagente **predecibles, observables y listos para escalar**. Cada bloque vuelve a alguno de esos tres adjetivos. **Observable** tiene slide propia (19) y reaparece en el caso Mount Sinai, con su cita sobre el logging.
 - **Frase ancla:** *"Funcionó en la demo" es donde termina el amateur y empieza el arquitecto* (Khairallah). Une el gancho con el cierre.
 - **Público:** congreso de informática en salud con perfiles técnicos, investigadores y clínicos. Definir cada término la primera vez. En salud el error tiene costo real, así que el human-in-the-loop y el "radio de impacto" (blast radius) son el corazón de la charla, no un apéndice.
 - **Ejemplos en clave salud:** triage de consultas, resumen de historia clínica (HC), epicrisis. Nunca afirmar que el Hospital Italiano usa algo que no sepamos.
@@ -17,7 +17,7 @@
 - **Fuentes:** los artículos de X sirven para el encuadre y las frases. Para las cifras, citar la fuente primaria (Anthropic, LangChain, martinfowler.com). Ante una audiencia académica conviene decir explícitamente que "Graph Engineering" es un nombre nuevo para ideas de sistemas distribuidos y workflows que tienen décadas.
 - **Formato virtual:** un diagrama por idea, poco texto y un cambio visual cada 60–90 s. Usar el chat dos veces: en la apertura y en el cierre.
 - **Agenda = los 5 bullets del post.** Cambia un solo punto del orden: *Harness vs Loops vs Graph* va primero porque el gancho habla del harness.
-- **Lenguaje visual común:** todos los diagramas usan la misma gramática. Se presenta en las slides 8 y 11 y después no se explica más.
+- **Lenguaje visual común:** todos los diagramas usan la misma gramática. Se presenta en las slides 8 y 12 y después no se explica más.
   - **Agente:** rectángulo redondeado; si tiene un loop, una flecha ↻ adentro.
   - **Código:** cuadrado gris sin redondear.
   - **Verificador o compuerta:** rombo.
@@ -34,12 +34,12 @@
 | # | Bloque (bullet del post) | Slides | Tiempo | Acumulado |
 |---|---|---|---|---|
 | — | Apertura | 1–4 | 2:25 | 2:25 |
-| 01 | Harness vs Loops vs Graph | 5–8 | 3:30 | 5:55 |
-| 02 | Cuándo conviene uno o varios agentes | 9–10 | 2:35 | 8:30 |
-| 03 | Patrones: routing, paralelización, supervisor | 11–14 | 4:20 | 12:50 |
-| 04 | Estado compartido, errores, observabilidad y human-in-the-loop | 15–19 | 5:50 | 18:40 |
-| 05 | Casos reales y lecciones aprendidas | 20–22 | 3:15 | 21:55 |
-| — | Cierre | 23–24 | 1:05 | 23:00 |
+| 01 | Harness vs Loops vs Graph | 5–9 | 4:15 | 6:40 |
+| 02 | Cuándo conviene uno o varios agentes | 10–11 | 2:35 | 9:15 |
+| 03 | Patrones: routing, paralelización, supervisor | 12–15 | 4:20 | 13:35 |
+| 04 | Estado compartido, errores, observabilidad y human-in-the-loop | 16–20 | 5:50 | 19:25 |
+| 05 | Herramientas, casos reales y lecciones aprendidas | 21–24 | 4:00 | 23:25 |
+| — | Cierre | 25–26 | 1:05 | 24:30 |
 
 ---
 
@@ -69,7 +69,7 @@
 
 ---
 
-## Bloque 01 · Harness vs Loops vs Graph (2:25 → 5:55)
+## Bloque 01 · Harness vs Loops vs Graph (2:25 → 6:40)
 
 ### 05 · Separador
 **01 · HARNESS VS LOOPS VS GRAPH**: el modelo es solo un nodo
@@ -115,11 +115,27 @@
   - **Estado:** lo que pasa de nodo en nodo y sobrevive a la sesión.
 - Sin loops adentro, un grafo produce trabajo sin verificar en paralelo, que es peor que en serie porque hay más. Sin grafo alrededor, un loop es un paso muy bueno en una fila que nadie diseñó.
 
+### 09 · Nada nuevo bajo el sol *(desmitificar el término)*
+**Diagrama:** línea de tiempo horizontal con seis hitos. Cada uno lleva el año grande, el nombre y una línea que lo conecta con la charla. Una flecha punteada vuelve del último hito (Pregel, 2010) al primero (Euler, 1736) con la etiqueta *"Pregel: el río de los puentes de Euler"*. Abajo, el remate en una banda verde.
+| Año | Hito | Qué nos dejó |
+|---|---|---|
+| **1736** | Euler, los puentes de Königsberg | Nace la teoría de grafos: puntos y líneas, nodos y aristas |
+| **1854** | Boole, *Las leyes del pensamiento* | La lógica se vuelve álgebra: cada condición de routing (cada `if`) es una expresión booleana |
+| **1937** | Shannon, tesis de maestría en el MIT | El álgebra de Boole se vuelve circuito: compuertas que deciden por dónde pasa la señal |
+| **1958** | PERT / CPM (Marina de EE. UU., DuPont) | El proyecto como red de dependencias y camino crítico: *secuencia no es dependencia* |
+| **1970s** | Algoritmos clínicos y árboles de decisión | La medicina ya razona en grafos: guías, flujogramas y protocolos |
+| **2010** | Pregel (Google) | Cómputo distribuido sobre grafos. LangGraph declara que se inspira en él |
+- Dato para el remate: Google llamó **Pregel** a su sistema en honor a Euler, porque **Pregel es el río que cruzaban los puentes de Königsberg**. El framework de agentes "de moda" lleva el nombre del problema de 1736.
+- Mensaje: los grafos dirigidos, los árboles de decisión y el álgebra de Boole son materia de matemática discreta de primer año. **Lo nuevo no es el grafo. Lo nuevo es que algunos nodos ahora son un LLM.**
+- Para esta audiencia: el algoritmo clínico que usan en la guardia ya es un grafo dirigido con nodos de decisión. Graph engineering es aplicar esa disciplina a sistemas con modelos.
+- Tiempo: 45 s. Sin leer la línea de tiempo: señalar 1736, 1958 y la flecha de vuelta.
+- Fuentes: Euler, *Solutio problematis ad geometriam situs pertinentis* (1736); Boole, *An Investigation of the Laws of Thought* (1854); Shannon, *A Symbolic Analysis of Relay and Switching Circuits* (MIT, 1937); PMI, *Project network models: past, present and future*; JAMA, serie *Toward Optimal Laboratory Use* (1975); Malewicz et al., *Pregel: A System for Large-Scale Graph Processing* (SIGMOD 2010); documentación de LangGraph.
+
 ---
 
-## Bloque 02 · Cuándo conviene uno o varios agentes (5:55 → 8:30)
+## Bloque 02 · Cuándo conviene uno o varios agentes (6:40 → 9:15)
 
-### 09 · El test de la arista falsa *(ejemplo en vivo, muy visual)*
+### 10 · El test de la arista falsa *(ejemplo en vivo, muy visual)*
 **Diagrama (imprescindible):** antes y después. Arriba, la cadena lineal con las aristas falsas tachadas en rojo, cada una con la etiqueta *"no cruza ningún dato"*. Abajo, los tres nodos en paralelo que confluyen en Resumen, con las aristas reales etiquetadas (`labs`, `imágenes`, `evoluciones`). Si el template lo permite, animar el paso de una versión a la otra.
 ```
 ANTES    Labs ──✗──▶ Imágenes ──✗──▶ Evoluciones ──▶ Resumen
@@ -133,7 +149,7 @@ DESPUÉS  Labs ────────┐
 - Un workflow lineal de 40 pasos tiene 40 puntos de falla en serie. El mismo trabajo como grafo suele tener 3–5 dependencias reales. Fuente: Kopadze, *Graph Engineering explained* (jul. 2026).
 - Frase: **"El modelo nunca fue el cuello de botella. La línea que dibujaste, sí."**
 
-### 10 · ¿Uno o varios? *(tabla de decisión)*
+### 11 · ¿Uno o varios? *(tabla de decisión)*
 | Un agente, un loop, cuando… | Un grafo, cuando… |
 |---|---|
 | La tarea es corta y cabe en un contexto | El trabajo se puede paralelizar |
@@ -147,11 +163,11 @@ DESPUÉS  Labs ────────┐
 
 ---
 
-## Bloque 03 · Patrones de orquestación (8:30 → 12:50)
+## Bloque 03 · Patrones de orquestación (9:15 → 13:35)
 
 > Un mismo caso de salud atraviesa los tres patrones: **asistente para el equipo de salud que procesa consultas y arma resúmenes clínicos.** Cada patrón lleva un diagrama, un ejemplo y una línea de "cuándo".
 
-### 11 · Separador + anatomía de un nodo
+### 12 · Separador + anatomía de un nodo
 **Diagrama:** a la izquierda, una *tarjeta de contrato* de un nodo: entrada → [un solo trabajo] → salida estructurada, con una salida lateral roja para el estado de falla. A la derecha, la leyenda de los 4 tipos de nodo con su forma (splitter, worker con ↻, cuadrado gris de código y rombo de gate). Es el glosario visual del resto de la charla.
 **03 · PATRONES**
 - Cuatro tipos de nodo: **splitter** (parte el trabajo), **worker** (hace una unidad), **code node** (une, ordena, deduplica) y **gate** (verifica o aprueba). Fuente: hanakoxbt (ago. 2026).
@@ -159,21 +175,21 @@ DESPUÉS  Labs ────────┐
 - Cada nodo tiene un **contrato**: un trabajo, una entrada explícita, una salida estructurada y un estado de falla claro.
 - Frase: **"Un grafo donde cada arista es un agente paga tokens por su propio cableado."**
 
-### 12 · Routing
+### 13 · Routing
 **Diagrama (imprescindible, misma gramática y tamaño que 13 y 14):** una entrada que pasa por un rombo clasificador y se abre en tres ramas (Turnos, Laboratorio, Administrativa). Una cuarta rama roja, "urgencia / no sé", termina en el ícono de persona. Rótulo: *el modelo elige, el grafo limita las opciones*.
 - Un clasificador mira la entrada y elige solo la ruta que hace falta.
 - **El clasificador es probabilístico; las rutas permitidas son determinísticas.** El modelo juzga y el grafo limita lo que ese juicio puede disparar.
 - Ejemplo: la consulta se deriva a turnos, laboratorio o administrativa, mientras que **urgencia o "no sé"** va directo a un humano.
 - Lo simple queda barato y lo riesgoso entra a un grafo más profundo.
 
-### 13 · Paralelización: el diamante *(fan-out → reduce → synthesize)*
+### 14 · Paralelización: el diamante *(fan-out → reduce → synthesize)*
 **Diagrama (imprescindible):** forma de diamante. Un splitter se abre en tres workers en paralelo (Labs, Imágenes, Evoluciones), que convergen en un cuadrado gris de código (dedupe / normalizar), después en un nodo de síntesis y al final en un rombo verificador. Rótulos arriba: *fan-out → reduce → synthesize*.
 - Se reparte el trabajo, varios workers investigan en paralelo, un **código** comprime y un agente final sintetiza.
 - Ejemplo: el resumen de un paciente, con un nodo para laboratorio, otro para imágenes y otro para evoluciones, seguido de dedupe y normalización en código, una síntesis y un verificador.
 - Es el patrón de la función de research de Claude. Fuente: Anthropic, *How we built our multi-agent research system* (jun. 2025).
 - Unir resultados solo cuando el siguiente nodo necesita el conjunto completo; si no, que el flujo siga.
 
-### 14 · Supervisor + ciclo controlado
+### 15 · Supervisor + ciclo controlado
 **Diagrama (imprescindible):** un supervisor en el centro con tres workers alrededor (Reúne, Redacta, Valida). Desde el rombo de validación sale una flecha de vuelta hacia Redacta, rotulada `máx. 3 · presupuesto`, y una salida lateral "escalar" hacia el ícono de persona. Así el ciclo controlado se ve con sus topes.
 - **Supervisor (orquestador–workers):** decide dinámicamente qué subtareas crear y a quién delegarlas. Ejemplo: en una epicrisis, un nodo reúne la información, otro redacta y otro valida contra la HC.
 - Es el patrón más flexible y el menos predecible.
@@ -188,23 +204,23 @@ DESPUÉS  Labs ────────┐
 
 ---
 
-## Bloque 04 · Estado compartido, control de errores, observabilidad y human-in-the-loop (12:50 → 18:40)
+## Bloque 04 · Estado compartido, control de errores, observabilidad y human-in-the-loop (13:35 → 19:25)
 
-### 15 · Estado compartido → *predecible*
+### 16 · Estado compartido → *predecible*
 **Diagrama:** contraste en dos filas. Arriba (✗): un nodo le pasa al siguiente una masa enorme de texto ("transcripción completa"). Abajo (✓): le pasa una etiqueta pequeña `ID: resumen_042` que apunta a un archivo guardado, con un ícono de checkpoint 💾 sobre la arista.
 - **Mover referencias a artefactos, no transcripciones gigantes.** Cada nodo guarda su resultado y devuelve un path, un ID o un resumen estructurado. Así cada transición es auditable.
 - Cada nodo recibe el estado mínimo necesario.
 - **Checkpoints** después de los nodos caros: si se corta, retoma donde quedó.
 - El grafo tiene que poder responder en todo momento qué corrió, qué está pendiente y por qué tomó cada ruta. Si no puede, sigue siendo una demo.
 
-### 16 · El verificador es todo el truco
+### 17 · El verificador es todo el truco
 **Diagrama:** dos escenas. A la izquierda (✗), las burbujas de contexto del worker y del verificador superpuestas, con el verificador rotulado "asiente 👍". A la derecha (✓), burbujas separadas y el verificador apoyado en un ancla ⚓ ("test que corrió" / "registro real de la HC").
 - Los modelos se pierden la mayoría de sus propios errores. **Quien hizo el trabajo no lo verifica.**
 - El verificador tiene **contexto limpio**. Si comparte el chat del worker, no verifica: asiente.
 - Necesita **anclas**: señales que no se pueden discutir, como un test que corrió o un dato que coincide con la fuente. En salud, que la cita apunte al registro real de la HC.
 - *"Un loop con un verificador real le gana a un grafo sin ninguno."* (AI Builder Club)
 
-### 17 · Control de errores → *falla local, no sistémica*
+### 18 · Control de errores → *falla local, no sistémica*
 | Falla | Antídoto |
 |---|---|
 | **Colapso de contexto:** mil salidas a una síntesis | Fan-in por capas: resumir lotes y después combinar |
@@ -215,7 +231,7 @@ DESPUÉS  Labs ────────┐
 - Fuentes: Kopadze; hanakoxbt; 0xwhrrari.
 - Frase: **"La confiabilidad no sale de esperar que cada nodo funcione, sino de decidir qué hace el grafo cuando uno no funciona."**
 
-### 18 · Observabilidad → *observable* *(slide dedicada: es la promesa del post)*
+### 19 · Observabilidad → *observable* *(slide dedicada: es la promesa del post)*
 **Diagrama (imprescindible):** una traza en cascada. Cada nodo de una corrida es una barra horizontal sobre un eje de tiempo y al costado de cada barra van tokens, costo y latencia. La barra del verificador muestra un ❌ y un reintento, y la de la persona muestra "aprobó: Dra. X". Rótulo: *una traza por corrida, un span por nodo*.
 - La prueba: **ante un resultado raro, ¿podés reconstruir en 5 minutos qué pasó?** Si no, el sistema no está listo para producción.
 - **Una traza por corrida y un span por nodo.** Qué registrar en cada nodo:
@@ -243,7 +259,7 @@ DESPUÉS  Labs ────────┐
   - plataformas como LangSmith, **Langfuse** (open source y auto-hosteable, relevante para datos sensibles) o Arize Phoenix
 - Frase: **"Sin trazas no hay producción. Un grafo que no podés auditar es una caja negra con más pasos."**
 
-### 19 · Human-in-the-loop: la compuerta por radio de impacto *(slide clave para salud)*
+### 20 · Human-in-the-loop: la compuerta por radio de impacto *(slide clave para salud)*
 **Diagrama (imprescindible, el más fuerte para salud):** tres carriles tipo autopista, de arriba abajo. Verde abierto, amarillo con un rombo de control en el medio y rojo con una barrera cerrada y el ícono de persona en ese único punto. El rótulo del rojo dice: *no es un umbral alto, es un carril cerrado*.
 ```
  Borrador interno      ══════════════════▶   ✅ abierto
@@ -264,11 +280,29 @@ DESPUÉS  Labs ────────┐
 
 ---
 
-## Bloque 05 · Casos reales y lecciones aprendidas (18:40 → 21:55)
+## Bloque 05 · Casos reales y lecciones aprendidas (19:25 → 23:25)
 
-> Dos casos públicos de medicina, con un mensaje cada uno: Mount Sinai muestra que el grafo **escala** y MAI-DxO que el grafo **se diseña**.
+> Primero, un puente: dónde vive hoy el grafo (herramientas, protocolos y HL7). Después, dos casos públicos de medicina, con un mensaje cada uno: Mount Sinai muestra que el grafo **escala** y MAI-DxO que el grafo **se diseña**.
 
-### 20 · Caso 1 · Mount Sinai: un agente vs. un orquestador *(caso principal, 1:30)*
+### 21 · El grafo ya está en todas partes *(puente hacia los casos, 0:45)*
+**Diagrama:** tres tarjetas en fila, cada una con un mini-grafo de 3 nodos y su "dónde vive el grafo". Abajo, una tarjeta ancha resaltada para salud (HL7) y la banda verde con el mensaje. No hacer capturas de las herramientas: logo textual y una línea.
+| Dónde | Ejemplos | Qué parte del grafo resuelven |
+|---|---|---|
+| **Frameworks de agentes (código)** | LangGraph | Nodos, aristas, estado y checkpoints como primitivas del framework. Se inspira en Pregel (slide 9) |
+| **Automatización low-code** | n8n, Make | El canvas *es* el grafo: nodos (n8n) o módulos (Make) unidos por conexiones y routers. n8n tiene un nodo *AI Agent*: el LLM es literalmente un nodo más |
+| **Protocolos abiertos** | MCP (agente ↔ herramientas), A2A (agente ↔ agente) | Estandarizan **las aristas**. Ambos están bajo la Agentic AI Foundation de la Linux Foundation (MCP desde dic. 2025, A2A desde ago. 2026) |
+- **En salud, HL7 ya modela grafos y ahora se ocupa de la IA:**
+  - **CPG on FHIR** (Clinical Practice Guidelines, STU2): la guía clínica como `PlanDefinition` computable. Acciones (nodos), condiciones en CQL (aristas condicionales) y `relatedAction` *before/after* (dependencias). Es un grafo dirigido estandarizado.
+  - **CDS Hooks:** puntos de entrada en el workflow de la HCE donde un servicio externo (hoy, un agente) puede intervenir. Son las compuertas del grafo clínico.
+  - **AI Transparency on FHIR** (ballot STU1, ene. 2026): marca qué dato fue generado o modificado por IA y, vía `Provenance`, qué modelo, qué entradas y qué humano participó. Es el audit trail de la slide 19, como estándar.
+  - **HL7 AI Office** (jul. 2025): oficina dedicada a estándares de IA confiable en salud.
+- Mensaje: **no hace falta inventar el grafo; hace falta diseñarlo bien.** Las piezas (orquestación, protocolos y semántica clínica) ya existen y son abiertas.
+- Para esta audiencia: si ya trabajan con FHIR, la guía clínica en `PlanDefinition` es el mapa natural del grafo, y los agentes son nodos que se enchufan en él.
+- Cuidado al presentarlo: no decir que HL7 tiene "un framework de agentes". Lo que existe son estándares que el grafo puede usar (guías computables, puntos de enganche, trazabilidad de IA). El ballot de AI Transparency todavía no es versión publicada.
+- Tiempo: 45 s. Señalar las tres tarjetas en una frase cada una y detenerse en HL7.
+- Fuentes: LangGraph docs; n8n docs (AI Agent node); Linux Foundation / AAIF (MCP, A2A); HL7 CPG IG STU2; CDS Hooks; HL7 *AI Transparency on FHIR* (2026Jan ballot); HL7, lanzamiento del AI Office (jul. 2025); Velamuri, *Relevance of HL7 FHIR Standards in the Age of Agentic AI*, HL7 News (ene. 2026).
+
+### 22 · Caso 1 · Mount Sinai: un agente vs. un orquestador *(caso principal, 1:30)*
 **Diagrama (opcional):** a la izquierda, un solo agente desbordado por 80 tareas apiladas, con el número grande **16%**. A la derecha, un orquestador que reparte las tareas en carriles entre agentes especializados, con el número grande **65× menos cómputo**. **No dibujar una curva:** solo hay dos datos publicados y una curva inventaría el resto.
 - **Qué es:** un estudio del Windreich Department of AI and Human Health de Mount Sinai (Nueva York), publicado en *npj Health Systems* el 9 de marzo de 2026: *"Orchestrated multi agents sustain accuracy under clinical scale workloads compared to a single agent"*. Lead author: Eyal Klang; senior author: Girish Nadkarni.
 - **El experimento:** tareas clínicas de recuperación de información, extracción de datos y **cálculo de dosis de medicación**, bajo carga creciente de hasta **80 tareas simultáneas**. Compararon un agente único que hace todo contra un **orquestador que reparte el trabajo entre agentes especializados**.
@@ -277,12 +311,12 @@ DESPUÉS  Labs ────────┐
   - El orquestado mantuvo la precisión estable.
 - **Por qué es el caso perfecto para esta charla:** demuestra los tres adjetivos del post:
   - **Predecible:** la precisión se sostiene bajo carga.
-  - **Observable** (callback a la slide 18): *"Cada paso queda registrado: qué herramienta se llamó, qué devolvió y cómo se armó la respuesta"* (Mahmud Omar).
+  - **Observable** (callback a la slide 19): *"Cada paso queda registrado: qué herramienta se llamó, qué devolvió y cómo se armó la respuesta"* (Mahmud Omar).
   - **Escalable:** 65× menos cómputo.
 - **Tipo de evidencia:** revista con revisión por pares, en condiciones simuladas. El próximo paso declarado es probarlo con datos de pacientes en tiempo real.
 - Frase de Klang: *"Cuando un orquestador divide el trabajo entre agentes especializados, el sistema se mantiene preciso, ágil y mucho más eficiente."*
 
-### 21 · Caso 2 · Microsoft MAI-DxO: un grafo con roles médicos *(1:00)*
+### 23 · Caso 2 · Microsoft MAI-DxO: un grafo con roles médicos *(1:00)*
 **Diagrama:** mapeo en dos columnas unidas por líneas. A la izquierda, los roles médicos (Dr. Hypothesis, Dr. Test-Chooser, Dr. Challenger, Dr. Stewardship, Dr. Checklist). A la derecha, la pieza del grafo con su forma: supervisor, worker, rombo verificador, presupuesto del ciclo y compuerta. Muestra sin explicarlo que todo lo que vimos ya existe en medicina.
 - **Qué es:** *MAI Diagnostic Orchestrator* (Microsoft AI, jun. 2025; paper *Sequential Diagnosis with Language Models*). Resuelve casos clínicos **paso a paso**: pregunta, pide estudios y propone diagnóstico.
 - **El grafo (diagrama del panel):** el mismo modelo juega cinco roles:
@@ -299,7 +333,7 @@ DESPUÉS  Labs ────────┐
   - **No está aprobado para uso clínico.**
 - Mensaje: **la mejora vino del diseño del grafo (roles, verificador, presupuesto), no de un modelo nuevo.** Es el mismo argumento del +13.7 de LangChain, ahora en medicina.
 
-### 22 · Lecciones aprendidas *(0:30)*
+### 24 · Lecciones aprendidas *(0:30)*
 1. **Empezá con un loop.** Dibujá el grafo cuando las dependencias te obliguen.
 2. **Cortá las aristas falsas. Lo que puede ser código, que sea código.**
 3. **Construí el verificador primero**, con contexto limpio y anclas reales.
@@ -308,9 +342,9 @@ DESPUÉS  Labs ────────┐
 
 ---
 
-## Cierre (21:55 → 23:00)
+## Cierre (23:25 → 24:30)
 
-### 23 · Checklist para llevarse
+### 25 · Checklist para llevarse
 Antes de dibujar un grafo:
 1. ¿Puedo nombrar el dato que cruza cada arista?
 2. ¿Qué nodos son código y cuáles necesitan un modelo?
@@ -318,7 +352,7 @@ Antes de dibujar un grafo:
 4. ¿Qué pasa cuando falla cada nodo? ¿Puedo reconstruir una corrida desde la traza?
 5. ¿Dónde decide un humano y qué carril no se abre nunca?
 
-### 24 · Cierre + CTA
+### 26 · Cierre + CTA
 - Volver al gancho: **"Funcionó en local" es donde termina la demo. Predecible, observable y escalable es donde empieza el sistema.**
 - Resumen en tres verbos: **Contener. Converger. Repartir.**
 - Contacto, LinkedIn y QR a las referencias. Abrir preguntas en el chat.
@@ -346,6 +380,25 @@ Antes de dibujar un grafo:
 - Anthropic, *Building effective agents* (dic. 2024)
 - Anthropic Engineering, *How we built our multi-agent research system* (jun. 2025)
 
+**Historia de los grafos (slide 9)**
+- Euler, L., *Solutio problematis ad geometriam situs pertinentis* (1736): https://en.wikipedia.org/wiki/Seven_Bridges_of_K%C3%B6nigsberg
+- Boole, G., *An Investigation of the Laws of Thought* (1854)
+- Shannon, C., *A Symbolic Analysis of Relay and Switching Circuits*, tesis de maestría, MIT (1937)
+- PMI, *Project network models: past, present, and future* (PERT/CPM, 1957–58): https://www.pmi.org/learning/library/project-network-models-past-present-future-5685
+- JAMA, serie *Toward Optimal Laboratory Use* (1975): algoritmos clínicos y tablas de decisión
+- Malewicz, G. et al., *Pregel: A System for Large-Scale Graph Processing*, SIGMOD (2010)
+- LangGraph, documentación oficial (inspiración en Pregel y Apache Beam): https://reference.langchain.com/python/langgraph/
+
+**Herramientas y estándares (slide 21)**
+- LangGraph, documentación oficial: https://reference.langchain.com/python/langgraph/
+- n8n, *AI Agent node*: https://docs.n8n.io · Make: https://www.make.com
+- Linux Foundation, Agentic AI Foundation (MCP, dic. 2025; A2A, ago. 2026): https://axios.com/2026/08/17/a2a-agentic-ai-foundation-open-ai-standards
+- HL7, *Clinical Practice Guidelines (CPG on FHIR)* STU2: https://www.hl7.org/fhir/uv/cpg/StructureDefinition-cpg-pathwaydefinition.html
+- HL7, *CDS Hooks*: https://cds-hooks.hl7.org
+- HL7, *AI Transparency on FHIR* (ballot 2026Jan): https://hl7.org/fhir/uv/aitransparency/2026Jan/index.html
+- HL7, *HL7 International Launches AI Office* (jul. 2025): https://blog.hl7.org/hl7-international-launches-ai-office-to-set-global-standards-for-healthcares-ai-revolution
+- Velamuri, S., *Relevance of HL7 FHIR Standards in the Age of Agentic AI*, HL7 News (7 ene. 2026): https://hl7news.hl7.org/2026/01/07/relevance-of-hl7-fhir-standards-in-the-age-of-agentic-ai/
+
 **Encuadre (artículos en X)**
 - Kopadze, A., *Graph Engineering explained: what it is, when to use it and when not to* (24 jul. 2026): https://x.com/AnatoliKopadze/status/2080668775796314331
 - hanakoxbt, *Loops and Graphs: how to stop babysitting agents and only approve the last step* (23 ago. 2026): https://x.com/hanakoxbt/status/2091515787366306154
@@ -356,8 +409,10 @@ Antes de dibujar un grafo:
 - Deck *Harness, Loop y Graph: el modelo ya no es el problema* (Prompteala 2026): `../harness-loop-graph.html`
 
 ## Plan B de tiempos (si vas atrasado)
-- Slide 11: nombrar los 4 tipos de nodo y saltear el contrato (−30 s).
-- Slide 17: desarrollar solo 3 de las 5 fallas (−45 s).
-- Slide 18: nombrar los tres usos de la traza y el audit trail, sin la lista de métricas (−30 s).
-- Slide 21: mostrar el diagrama del panel MAI-DxO y nombrar los roles sin desarrollarlos (−20 s).
-- Slide 22: quedarse con las lecciones 3, 4 y 5 (−15 s).
+- Slide 9: nombrar solo Euler, el algoritmo clínico y el río Pregel (−20 s).
+- Slide 21: nombrar las tres tarjetas en una frase y quedarse solo con AI Transparency de HL7 (−20 s).
+- Slide 12: nombrar los 4 tipos de nodo y saltear el contrato (−30 s).
+- Slide 18: desarrollar solo 3 de las 5 fallas (−45 s).
+- Slide 19: nombrar los tres usos de la traza y el audit trail, sin la lista de métricas (−30 s).
+- Slide 23: mostrar el diagrama del panel MAI-DxO y nombrar los roles sin desarrollarlos (−20 s).
+- Slide 24: quedarse con las lecciones 3, 4 y 5 (−15 s).

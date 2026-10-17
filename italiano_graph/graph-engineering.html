@@ -104,6 +104,19 @@ table.t th:last-child { border-radius: 0 16px 0 0; }
 table.t td { padding: 20px 26px; border-bottom: 2px solid var(--line); background: rgba(255,255,255,.92); vertical-align: top; }
 table.t td strong { color: var(--ink); }
 
+/* ---------------- Línea de tiempo (slide 9) ---------------- */
+.tl { position: relative; display: grid; grid-template-columns: repeat(6, 1fr); gap: 0 24px; margin-top: 44px; }
+.tl::before { content: ''; position: absolute; left: 0; right: 0; top: 96px; height: 4px; background: var(--gm); border-radius: 2px; }
+.tl-i { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.tl-y { font: 700 58px/1 var(--disp); color: var(--g); height: 70px; }
+.tl-dot { width: 30px; height: 30px; border-radius: 50%; background: #fff; border: 5px solid var(--g); margin: 0 0 22px; position: relative; z-index: 1; }
+.tl-t { font: 600 28px/1.15 var(--font); color: var(--ink); margin-bottom: 10px; }
+.tl-d { font: 400 22px/1.3 var(--font); color: var(--ink2); }
+.tl-i.hi .tl-y { color: var(--g3); }
+.tl-i.hi .tl-dot { background: var(--g3); border-color: var(--g3); }
+.tl-i.end .tl-dot { background: var(--g); }
+.tl-arc { position: absolute; left: 0; top: 300px; pointer-events: none; }
+
 /* ---------------- Gramática visual de los diagramas ---------------- */
 svg.d { display: block; overflow: visible; font-family: var(--font); }
 svg.d .n { fill: #fff; stroke: var(--g); stroke-width: 3; }
@@ -285,7 +298,7 @@ svg.d .hum { color: #fff; }
       <div class="card g">
         <div class="eyebrow">Agent = Model + Harness</div>
         <div class="num" style="font-size:120px">+13.7</div>
-        <p style="font:400 26px/1.35 var(--font);color:var(--ink2);margin:14px 0 0">puntos en Terminal Bench 2.0 con <strong>el mismo modelo</strong>, cambiando solo el harness.</p>
+        <p style="font:400 26px/1.35 var(--font);color:var(--ink2);margin:14px 0 0">puntos de <strong>LangChain</strong> en Terminal Bench 2.0 con <strong>el mismo modelo</strong>, cambiando solo el harness: del top 30 al top 5.</p>
       </div>
       <div class="quote" style="font-size:34px">“Terminado es una afirmación, no una prueba.”<cite>Addy Osmani · Loop Engineering</cite></div>
     </div>
@@ -327,6 +340,29 @@ svg.d .hum { color: #fff; }
       <div class="col card" style="padding:24px 30px"><div class="eyebrow">Estado</div><div style="font:400 26px/1.3 var(--font);color:var(--ink2)">Lo que pasa de nodo en nodo y sobrevive a la sesión.</div></div>
     </div>
   </div>
+</section>
+
+<!-- ============================ 09 · NADA NUEVO BAJO EL SOL ============================ -->
+<section class="slide s-content">
+  <div class="tab"><div class="k">01 · Harness vs Loops vs Graph</div><h2>Nada nuevo bajo el sol</h2></div>
+  <div class="body">
+    <p class="lead">“Graph engineering” es un nombre nuevo. <strong>Los grafos tienen casi 300 años.</strong></p>
+    <div class="tl">
+      <svg class="d tl-arc" width="1700" height="120" viewBox="0 0 1700 120">
+        <path d="M1568 4 L1568 50 Q1568 74 1544 74 L156 74 Q132 74 132 50 L132 10" fill="none" stroke="#009A4C" stroke-width="3" stroke-dasharray="9 8" marker-end="url(#arg)"/>
+        <rect class="lb" x="560" y="54" width="580" height="40" rx="8"/>
+        <text class="el" x="850" y="74" style="font-size:23px">Pregel: el río de los puentes de Euler</text>
+      </svg>
+      <div class="tl-i "><div class="tl-y">1736</div><div class="tl-dot"></div><div class="tl-t">Euler</div><div class="tl-d">Los puentes de Königsberg. Nace la teoría de grafos: nodos y aristas.</div></div>
+      <div class="tl-i "><div class="tl-y">1854</div><div class="tl-dot"></div><div class="tl-t">Boole</div><div class="tl-d"><em>Las leyes del pensamiento</em>: la lógica se vuelve álgebra. Cada if es booleano.</div></div>
+      <div class="tl-i "><div class="tl-y">1937</div><div class="tl-dot"></div><div class="tl-t">Shannon</div><div class="tl-d">Tesis en el MIT. El álgebra de Boole se vuelve circuito: compuertas que deciden.</div></div>
+      <div class="tl-i "><div class="tl-y">1958</div><div class="tl-dot"></div><div class="tl-t">PERT / CPM</div><div class="tl-d">Marina de EE.&nbsp;UU. y DuPont. Proyectos como redes de dependencias.</div></div>
+      <div class="tl-i hi"><div class="tl-y">1970s</div><div class="tl-dot"></div><div class="tl-t">Algoritmos clínicos</div><div class="tl-d">Árboles de decisión y flujogramas: la medicina ya razona en grafos.</div></div>
+      <div class="tl-i end"><div class="tl-y">2010</div><div class="tl-dot"></div><div class="tl-t">Pregel (Google)</div><div class="tl-d">Grafos a escala. LangGraph declara que se inspira en él.</div></div>
+    </div>
+    <div class="punch" style="position:absolute;left:0;right:0;bottom:0">Lo nuevo no es el grafo. Lo nuevo es que <strong>algunos nodos ahora son un LLM.</strong></div>
+  </div>
+  <div class="src">Fuentes: <b>Euler</b> (1736) · <b>Boole</b> (1854) · <b>Shannon</b>, MIT (1937) · <b>PMI</b>, PERT/CPM · <b>JAMA</b>, “Toward Optimal Laboratory Use” (1975) · <b>Malewicz et al.</b>, Pregel, SIGMOD (2010) · docs de <b>LangGraph</b></div>
 </section>
 
 <!-- ============================ 09 · ARISTA FALSA ============================ -->
@@ -686,6 +722,57 @@ svg.d .hum { color: #fff; }
     </div>
   </div>
   <div class="src">Fuente: <b>hanakoxbt</b>, “Loops and Graphs” (ago. 2026) — “Un humano en el medio del grafo se vuelve el nodo más lento.”</div>
+</section>
+
+<!-- ============================ 21 · HERRAMIENTAS Y ESTÁNDARES ============================ -->
+<section class="slide s-content">
+  <div class="tab"><div class="k">05 · Casos reales</div><h2>El grafo ya está en todas partes</h2></div>
+  <div class="body">
+    <div class="row" style="gap:30px">
+      <div class="col card" style="padding:26px 30px">
+        <div class="eyebrow">Código</div>
+        <svg class="d" width="440" height="90" viewBox="0 0 440 90" style="margin:6px 0 18px">
+          <rect class="n" x="4" y="14" width="110" height="52" rx="12"/><rect class="n" x="164" y="14" width="110" height="52" rx="12"/><rect class="n" x="324" y="14" width="110" height="52" rx="12"/>
+          <use href="#loop" class="loop" x="80" y="20" width="26" height="26"/><use href="#loop" class="loop" x="240" y="20" width="26" height="26"/><use href="#loop" class="loop" x="400" y="20" width="26" height="26"/>
+          <text class="t" x="44" y="40" style="font-size:20px">nodo</text><text class="t" x="204" y="40" style="font-size:20px">nodo</text><text class="t" x="364" y="40" style="font-size:20px">nodo</text>
+          <path class="e" d="M116 40 L160 40"/><path class="e" d="M276 40 L320 40"/>
+        </svg>
+        <h3 style="margin-bottom:8px">LangGraph</h3>
+        <div style="font:400 24px/1.3 var(--font);color:var(--ink2)">Nodos, aristas, estado y checkpoints como piezas del framework.</div>
+      </div>
+      <div class="col card" style="padding:26px 30px">
+        <div class="eyebrow">Automatización low-code</div>
+        <svg class="d" width="440" height="90" viewBox="0 0 440 90" style="margin:6px 0 18px">
+          <rect class="c" x="4" y="14" width="110" height="52"/><rect class="ns" x="164" y="14" width="110" height="52" rx="12"/><rect class="c" x="324" y="14" width="110" height="52"/>
+          <text class="t" x="59" y="40" style="font-size:20px">trigger</text><text class="tw" x="219" y="40" style="font-size:20px">AI Agent</text><text class="t" x="379" y="40" style="font-size:20px">acción</text>
+          <path class="e" d="M116 40 L160 40"/><path class="e" d="M276 40 L320 40"/>
+        </svg>
+        <h3 style="margin-bottom:8px">n8n · Make</h3>
+        <div style="font:400 24px/1.3 var(--font);color:var(--ink2)">El canvas <em>es</em> el grafo. El LLM es un nodo más.</div>
+      </div>
+      <div class="col card" style="padding:26px 30px">
+        <div class="eyebrow">Protocolos abiertos</div>
+        <svg class="d" width="440" height="90" viewBox="0 0 440 90" style="margin:6px 0 18px">
+          <rect class="c" x="4" y="14" width="110" height="52"/><rect class="n" x="164" y="14" width="110" height="52" rx="12"/><rect class="n" x="324" y="14" width="110" height="52" rx="12"/>
+          <text class="t" x="59" y="40" style="font-size:20px">tool</text><text class="t" x="219" y="40" style="font-size:20px">agente</text><text class="t" x="379" y="40" style="font-size:20px">agente</text>
+          <line x1="116" y1="40" x2="162" y2="40" stroke="#009A4C" stroke-width="6"/><line x1="276" y1="40" x2="322" y2="40" stroke="#009A4C" stroke-width="6"/>
+          <text class="el" x="139" y="82" style="font-size:18px">MCP</text><text class="el" x="299" y="82" style="font-size:18px">A2A</text>
+        </svg>
+        <h3 style="margin-bottom:8px">MCP · A2A</h3>
+        <div style="font:400 24px/1.3 var(--font);color:var(--ink2)">Estandarizan <strong>las aristas</strong>: agente ↔ herramienta (MCP) y agente ↔ agente (A2A).</div>
+      </div>
+    </div>
+    <div class="card g" style="margin-top:28px;padding:26px 36px">
+      <div class="eyebrow">En salud · HL7 / FHIR</div>
+      <div class="row" style="gap:40px">
+        <div class="col"><h3 style="margin-bottom:10px">CPG on FHIR <span class="pill" style="font-size:16px;padding:6px 12px;margin:0 0 0 8px;vertical-align:middle">STU2</span></h3><div style="font:400 24px/1.3 var(--font);color:var(--ink2)">La guía clínica como grafo computable: acciones, condiciones en CQL y dependencias (<code style="font:500 22px var(--mono);color:var(--g3)">PlanDefinition</code>).</div></div>
+        <div class="col"><h3 style="margin-bottom:10px">CDS Hooks</h3><div style="font:400 24px/1.3 var(--font);color:var(--ink2)">Los puntos donde un servicio, hoy un agente, se engancha al flujo de la historia clínica.</div></div>
+        <div class="col"><h3 style="margin-bottom:10px">AI Transparency on FHIR <span class="pill" style="font-size:16px;padding:6px 12px;margin:0 0 0 8px;vertical-align:middle">Ballot 2026</span></h3><div style="font:400 24px/1.3 var(--font);color:var(--ink2)">Qué dato tocó la IA, con qué modelo y con qué humano. El audit trail, como estándar.</div></div>
+      </div>
+    </div>
+    <div class="punch" style="position:absolute;left:0;right:0;bottom:0">No hace falta inventar el grafo. <strong>Hace falta diseñarlo bien.</strong></div>
+  </div>
+  <div class="src">Fuentes: docs de <b>LangGraph</b> y <b>n8n</b> · <b>Linux Foundation</b>, Agentic AI Foundation (MCP, A2A) · <b>HL7</b>: CPG on FHIR STU2, CDS Hooks, AI Transparency on FHIR (ballot ene. 2026), AI Office (jul. 2025)</div>
 </section>
 
 <!-- ============================ 20 · MOUNT SINAI ============================ -->
