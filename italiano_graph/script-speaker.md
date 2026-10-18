@@ -1,8 +1,8 @@
 # Guion: Graph Engineering. Sistemas multiagente predecibles, observables y listos para escalar
 
 **Congreso de Informática, Innovación e Investigación · Hospital Italiano de Buenos Aires · charla virtual**
-**Duración objetivo: 24:30** (0:30 de margen sobre los 25) · 26 slides · deck: `graph-engineering.html`
-Ritmo de referencia: ~130 palabras por minuto (~3.000 palabras en total). Los tiempos por slide salen del largo de cada texto, más ~15 s de chat en la slide 3. El texto está para estudiar la idea y decirla con tus palabras, no para leerlo.
+**Duración objetivo: 25:00** (sin margen sobre los 25: aplicar al menos un recorte del Plan B) · 27 slides · deck: `graph-engineering.html`
+Ritmo de referencia: ~130 palabras por minuto (~3.100 palabras en total). Los tiempos por slide salen del largo de cada texto, más ~15 s de chat en la slide 3. El texto está para estudiar la idea y decirla con tus palabras, no para leerlo.
 
 ---
 
@@ -16,7 +16,7 @@ Ritmo de referencia: ~130 palabras por minuto (~3.000 palabras en total). Los ti
 2. **"El modelo nunca fue el cuello de botella. La línea que dibujaste, sí."** (slide 10)
 3. **"Quien hizo el trabajo no lo verifica."** (slide 17)
 4. **"Sin trazas no hay producción."** (slide 19)
-5. **"Human-in-the-loop no es un parche. Es una arista que se diseña."** (slide 20)
+5. **"Human-in-the-loop no es un parche. Es una arista que se diseña."** (slide 21)
 6. Cierre: **"Contener. Converger. Repartir."**
 
 **Cronómetro por bloque:**
@@ -27,22 +27,23 @@ Ritmo de referencia: ~130 palabras por minuto (~3.000 palabras en total). Los ti
 | 01 Harness vs Loops vs Graph | 5–9 | 6:40 |
 | 02 ¿Uno o varios? | 10–11 | 9:15 |
 | 03 Patrones | 12–15 | 13:35 |
-| 04 Estado, errores, observabilidad y HITL | 16–20 | 19:25 |
-| 05 Herramientas, casos y lecciones | 21–24 | 23:25 |
-| Cierre | 25–26 | 24:30 |
+| 04 Estado, errores, observabilidad y HITL | 16–21 | 19:55 |
+| 05 Herramientas, casos y lecciones | 22–25 | 23:55 |
+| Cierre | 26–27 | 25:00 |
 
 **Si vas atrasado:**
 - **Slide 9:** nombrá solo Euler, el algoritmo clínico y el río Pregel (−20 s).
-- **Slide 21:** nombrá las tres tarjetas en una frase y quedate solo con AI Transparency de HL7 (−20 s).
+- **Slide 22:** nombrá las tres tarjetas en una frase y quedate solo con AI Transparency de HL7 (−20 s).
+- **Slide 20:** mostrá el header y los saltos rojos, sin el AuditEvent (−15 s).
 - **Slide 12:** nombrá los 4 tipos de nodo y saltá el contrato (−30 s).
 - **Slide 18:** desarrollá solo 3 de las 5 fallas (−45 s).
 - **Slide 19:** nombrá los tres usos de la traza y el audit trail, sin las métricas (−30 s).
-- **Slide 23:** mostrá el panel y nombrá los roles sin explicarlos (−20 s).
+- **Slide 24:** mostrá el panel y nombrá los roles sin explicarlos (−20 s).
 
 **Checklist técnico (virtual):**
 - Abrir el deck con internet una vez antes, para que carguen las tipografías.
 - Compartir **la ventana del navegador**, no la pantalla entera. Tecla **P** para pantalla completa; navegar con las flechas.
-- Tener el chat a la vista: se usa en la slide 3 y en la 26.
+- Tener el chat a la vista: se usa en la slide 3 y en la 27.
 
 **Convenciones:** *[clic]* = avanzar slide · *[señalar]* = mover el cursor sobre el diagrama · *[pausa]* = un segundo de silencio.
 
@@ -167,7 +168,7 @@ Guarden este patrón: en un rato vamos a ver un sistema de diagnóstico de Micro
 
 ---
 
-## BLOQUE 04 · ESTADO, ERRORES, OBSERVABILIDAD Y HITL (13:35 → 19:25)
+## BLOQUE 04 · ESTADO, ERRORES, OBSERVABILIDAD Y HITL (13:35 → 19:55)
 
 ### Slide 16 · Estado compartido — 13:35 → 14:35
 "Ahora, lo que los diagramas suelen esconder: el **estado**. *[señalar la fila roja]* El error clásico es que cada nodo le pase al siguiente toda la conversación: miles de tokens donde lo importante se pierde, y cada salto lo degrada un poco más.
@@ -200,7 +201,7 @@ Y **reintentos que duplican efectos**: escrituras idempotentes.
 
 La idea de fondo: *[señalar el banner]* la confiabilidad no sale de esperar que cada nodo funcione, sino de **decidir qué hace el grafo cuando uno no funciona.**"
 
-### Slide 19 · Observabilidad — 16:40 → 18:00
+### Slide 19 · Observabilidad — 16:40 → 17:45
 "Segunda promesa del título: **observable**. La prueba es simple: ante un resultado raro, ¿pueden reconstruir en cinco minutos qué pasó?
 
 *[señalar la traza]* Esto es una traza; los datos son ilustrativos. Una barra por nodo, en el tiempo. Se ve qué corrió en paralelo, cuántos tokens y cuánto tiempo usó cada uno, *[señalar la barra roja]* que el verificador rechazó una cita sin fuente, que hubo un reintento y *[señalar el final]* quién aprobó al final.
@@ -209,9 +210,16 @@ La idea de fondo: *[señalar el banner]* la confiabilidad no sale de esperar que
 
 *[señalar la tarjeta verde]* Y en salud hay un plus: la traza **es el audit trail**. Qué agente, con qué modelo, leyó qué dato, qué propuso y qué profesional lo aprobó.
 
-Herramientas hay varias, empezando por OpenTelemetry como estándar abierto, y algunas se pueden alojar en servidores propios, algo relevante con datos de pacientes. **Sin trazas no hay producción.**"
+**Sin trazas no hay producción.**"
 
-### Slide 20 · Human-in-the-loop — 18:00 → 19:25
+### Slide 20 · Correlación: un trace_id de punta a punta — 17:45 → 18:30
+"Pero ojo: tener trazas no alcanza si cada servicio arma la suya. En un incidente terminás con cinco trazas sueltas y nadie que las una. *[señalar el header]* La clave es **un solo `trace_id` por corrida** que viaje por todo el grafo. Ya hay estándar: el header `traceparent` de W3C, y OpenTelemetry lo propaga solo en cada llamada HTTP.
+
+*[recorrer el flujo]* El problema son los saltos que no son HTTP. *[señalar MCP]* Cuando el agente llama a una herramienta por MCP, el contexto tiene que ir en el campo `_meta`; el protocolo ya lo define. *[señalar la espera humana]* Y cuando la aprobación de un profesional llega tres horas después, hay que guardar el contexto en el checkpoint para retomar la misma traza.
+
+*[señalar el AuditEvent]* El cierre en salud: ese mismo `traceparent` se guarda en el `AuditEvent` de FHIR. Desde la auditoría de la historia clínica llegás a la traza completa del agente. **Un trace_id que se corta en un salto es un audit trail con un agujero.**"
+
+### Slide 21 · Human-in-the-loop — 18:30 → 19:55
 "Y llegamos a la slide que más me importa para esta audiencia. ¿Dónde ponemos al humano?
 
 La respuesta habitual es: cuando el modelo tiene poca confianza. El problema es que la confianza es justamente la variable que el modelo puede manipular. **La compuerta no se abre por la confianza del modelo, sino por lo que cuesta deshacer el error.**
@@ -224,14 +232,14 @@ Un último detalle: el humano va en **un solo paso**, el de mayor consecuencia. 
 
 ---
 
-## BLOQUE 05 · CASOS REALES Y LECCIONES (19:25 → 23:25)
+## BLOQUE 05 · CASOS REALES Y LECCIONES (19:55 → 23:55)
 
-### Slide 21 · El grafo ya está en todas partes — 19:25 → 20:10
+### Slide 22 · El grafo ya está en todas partes — 19:55 → 20:40
 "Antes de los casos, una pregunta práctica: ¿con qué se construye esto hoy? *[señalar las tres tarjetas]* Si programan, frameworks como **LangGraph** traen nodos, aristas y estado como piezas del lenguaje. Si no programan, **n8n** o **Make** son literalmente un grafo en pantalla, y n8n tiene un nodo de *AI Agent*: el LLM es un nodo más. Y los protocolos abiertos, **MCP** y **A2A**, estandarizan las aristas: cómo un agente habla con sus herramientas y con otros agentes.
 
 *[señalar HL7]* Y en salud, HL7 ya hace años que modela grafos: una guía clínica en FHIR, un `PlanDefinition`, son acciones, condiciones y dependencias. CDS Hooks define dónde engancharse en el flujo de la historia clínica. Y lo más nuevo: **AI Transparency on FHIR**, todavía en ballot, estandariza cómo marcar qué dato tocó la IA y con qué modelo. Es el audit trail del que hablamos, como estándar. **No hace falta inventar el grafo; hace falta diseñarlo bien.**"
 
-### Slide 22 · Caso 1 · Mount Sinai — 20:10 → 21:35
+### Slide 23 · Caso 1 · Mount Sinai — 20:40 → 22:05
 "Ahora sí, dos casos publicados. El primero es de un hospital académico, Mount Sinai, en Nueva York. Publicado en marzo de este año en *npj Health Systems*, con revisión por pares.
 
 *[señalar el diagrama]* Compararon dos diseños en tareas clínicas: buscar información, extraer datos y calcular dosis de medicación. A la izquierda, un único agente que hace todo. A la derecha, un orquestador que reparte el trabajo entre agentes especializados.
@@ -242,7 +250,7 @@ Y los sometieron a carga, hasta 80 tareas simultáneas. *[señalar el 16%]* Con 
 
 Una aclaración honesta: fueron condiciones simuladas. El próximo paso que declaran es probarlo con datos de pacientes en tiempo real."
 
-### Slide 23 · Caso 2 · Microsoft MAI-DxO — 21:35 → 23:00
+### Slide 24 · Caso 2 · Microsoft MAI-DxO — 22:05 → 23:30
 "El segundo caso es de Microsoft: MAI-DxO, un orquestador de diagnóstico. Resuelve casos clínicos paso a paso: pregunta, pide estudios y propone un diagnóstico.
 
 *[señalar el mapeo]* Lo interesante es su diseño: un panel de cinco 'médicos virtuales', y cada uno es una pieza del grafo que vimos. Dr. Hypothesis mantiene el diferencial: es el supervisor. Dr. Challenger es el abogado del diablo: el verificador. Dr. Stewardship controla costos: el presupuesto del ciclo. Dr. Checklist es la compuerta de calidad.
@@ -253,17 +261,17 @@ Ahora, y esto hay que decirlo con todas las letras: es un preprint sin revisión
 
 *[señalar el banner]* Lo que sí nos enseña es que la mejora vino del diseño del grafo (roles, verificador, presupuesto), no de un modelo nuevo. Es el mismo argumento del +13.7 del principio, ahora en medicina."
 
-### Slide 24 · Lecciones aprendidas — 23:00 → 23:25
+### Slide 25 · Lecciones aprendidas — 23:30 → 23:55
 "Cinco lecciones, rápido. **Uno**: empiecen con un loop. **Dos**: corten las aristas falsas, y lo que puede ser código, que sea código. **Tres**: construyan el verificador primero, con contexto limpio y anclas reales. **Cuatro**: evalúen el sistema entero; sin trazas no hay producción. **Cinco**: el humano va en un solo paso, el irreversible."
 
 ---
 
-## CIERRE (23:25 → 24:30)
+## CIERRE (23:55 → 25:00)
 
-### Slide 25 · Checklist — 23:25 → 24:00
+### Slide 26 · Checklist — 23:55 → 24:30
 "Si se llevan una sola slide, que sea esta. Antes de dibujar un grafo, cinco preguntas. ¿Puedo nombrar el dato que cruza cada arista? ¿Qué nodos son código y cuáles necesitan un modelo? ¿Dónde está el verificador y qué ancla usa? ¿Qué pasa cuando falla cada nodo, y puedo reconstruir una corrida desde la traza? ¿Y dónde decide un humano, y qué carril no se abre nunca?"
 
-### Slide 26 · Cierre — 24:00 → 24:30
+### Slide 27 · Cierre — 24:30 → 25:00
 "Volvamos al principio. *'Funcionó en local'* es donde termina la demo. Predecible, observable y escalable es donde empieza el sistema.
 
 Y si tienen que resumirlo en tres verbos: el harness **contiene**, el loop **converge** y el grafo **reparte**.

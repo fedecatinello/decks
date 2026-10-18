@@ -1,7 +1,7 @@
 # Graph Engineering: sistemas multiagente predecibles, observables y listos para escalar
 
 **Charla virtual · Congreso de Informática, Innovación e Investigación · Hospital Italiano de Buenos Aires**
-**25 minutos máx. (objetivo 24:30) · 26 slides · template: `Base presentacion (1).pptx`**
+**25 minutos máx. (objetivo 25:00, sin margen: aplicar al menos un recorte del Plan B) · 27 slides · template: `Base presentacion (1).pptx`**
 
 ---
 
@@ -37,9 +37,9 @@
 | 01 | Harness vs Loops vs Graph | 5–9 | 4:15 | 6:40 |
 | 02 | Cuándo conviene uno o varios agentes | 10–11 | 2:35 | 9:15 |
 | 03 | Patrones: routing, paralelización, supervisor | 12–15 | 4:20 | 13:35 |
-| 04 | Estado compartido, errores, observabilidad y human-in-the-loop | 16–20 | 5:50 | 19:25 |
-| 05 | Herramientas, casos reales y lecciones aprendidas | 21–24 | 4:00 | 23:25 |
-| — | Cierre | 25–26 | 1:05 | 24:30 |
+| 04 | Estado compartido, errores, observabilidad y human-in-the-loop | 16–21 | 6:20 | 19:55 |
+| 05 | Herramientas, casos reales y lecciones aprendidas | 22–25 | 4:00 | 23:55 |
+| — | Cierre | 26–27 | 1:05 | 25:00 |
 
 ---
 
@@ -204,7 +204,7 @@ DESPUÉS  Labs ────────┐
 
 ---
 
-## Bloque 04 · Estado compartido, control de errores, observabilidad y human-in-the-loop (13:35 → 19:25)
+## Bloque 04 · Estado compartido, control de errores, observabilidad y human-in-the-loop (13:35 → 19:55)
 
 ### 16 · Estado compartido → *predecible*
 **Diagrama:** contraste en dos filas. Arriba (✗): un nodo le pasa al siguiente una masa enorme de texto ("transcripción completa"). Abajo (✓): le pasa una etiqueta pequeña `ID: resumen_042` que apunta a un archivo guardado, con un ícono de checkpoint 💾 sobre la arista.
@@ -259,7 +259,23 @@ DESPUÉS  Labs ────────┐
   - plataformas como LangSmith, **Langfuse** (open source y auto-hosteable, relevante para datos sensibles) o Arize Phoenix
 - Frase: **"Sin trazas no hay producción. Un grafo que no podés auditar es una caja negra con más pasos."**
 
-### 20 · Human-in-the-loop: la compuerta por radio de impacto *(slide clave para salud)*
+### 20 · Correlación: un `trace_id` de punta a punta *(0:45)*
+**Diagrama (imprescindible):** arriba, el header `traceparent` desarmado en sus cuatro partes (`00` · **trace-id** · parent-id · flags), con el trace-id resaltado y rotulado *"igual en toda la corrida"* y el parent-id rotulado *"cambia en cada salto"*. Abajo, el recorrido de una corrida de punta a punta: HCE → orquestador → worker → herramienta FHIR vía MCP → agente externo vía A2A → aprobación humana → escritura en la HCE. Cada arista lleva el **portador** del contexto (`header HTTP`, `estado del grafo`, `_meta` de MCP, `header HTTP` de A2A, `checkpoint`, `AuditEvent`). Los saltos donde el contexto **no viaja solo** van marcados en rojo.
+- **Traza vs. correlación:** una traza por nodo no alcanza. Si cada servicio arma la suya, en un incidente tenés cinco trazas sueltas y nadie que las una. **Un solo `trace_id` por corrida**, y cada nodo abre un *span* hijo con su `span_id` y su `parent_id`.
+- **El estándar ya existe:** W3C Trace Context (Recomendación W3C) define el header `traceparent`. OpenTelemetry lo inyecta y lo lee solo en cada llamada HTTP.
+- **Dónde se corta (y hay que propagarlo a mano):**
+  - **MCP:** el contexto viaja en `_meta.traceparent` (SEP-414, *Final*). Sin esto, la llamada a la herramienta queda huérfana.
+  - **A2A:** va por HTTP, así que el `traceparent` pasa en el header como en cualquier servicio.
+  - **Estado del grafo y colas:** guardar el contexto junto al estado; si no, el nodo siguiente arranca una traza nueva.
+  - **La espera humana:** la aprobación puede llegar horas después. Se guarda el contexto en el checkpoint y, al retomar, el nuevo span se **vincula** (*span link*) a la corrida original.
+- **Logs:** cada línea de log lleva el `trace_id`. Del log a la traza completa en un click.
+- **En salud, el puente con la HCE:** el `traceparent` se guarda en el `AuditEvent` de FHIR (IHE *Basic Audit Log Patterns*, BALP, lo define como entidad de tipo `Traceparent`) y se puede referenciar desde el `Provenance` de AI Transparency (slide 23). Desde el registro de auditoría de la historia clínica se llega a la traza completa del agente.
+- **Cuidado:** el `trace_id` no es dato del paciente, pero el *baggage* de W3C se propaga a terceros: **nunca** poner identificadores de paciente ahí.
+- Frase: **"Un `trace_id` que se corta en un salto es un audit trail con un agujero."**
+- Tiempo: 45 s. Señalar el trace-id arriba, recorrer el flujo con el dedo y frenar en los saltos rojos (estado del grafo, MCP y la espera humana).
+- Fuentes: W3C, *Trace Context* (Recomendación); MCP, *SEP-414: OpenTelemetry Trace Context Propagation Conventions* (Final); OpenTelemetry, convenciones semánticas GenAI y MCP; IHE ITI, *Basic Audit Log Patterns* (BALP); eHealth Suisse, *CH EPR FHIR: Trace Context*.
+
+### 21 · Human-in-the-loop: la compuerta por radio de impacto *(slide clave para salud)*
 **Diagrama (imprescindible, el más fuerte para salud):** tres carriles tipo autopista, de arriba abajo. Verde abierto, amarillo con un rombo de control en el medio y rojo con una barrera cerrada y el ícono de persona en ese único punto. El rótulo del rojo dice: *no es un umbral alto, es un carril cerrado*.
 ```
  Borrador interno      ══════════════════▶   ✅ abierto
@@ -280,11 +296,11 @@ DESPUÉS  Labs ────────┐
 
 ---
 
-## Bloque 05 · Casos reales y lecciones aprendidas (19:25 → 23:25)
+## Bloque 05 · Casos reales y lecciones aprendidas (19:55 → 23:55)
 
 > Primero, un puente: dónde vive hoy el grafo (herramientas, protocolos y HL7). Después, dos casos públicos de medicina, con un mensaje cada uno: Mount Sinai muestra que el grafo **escala** y MAI-DxO que el grafo **se diseña**.
 
-### 21 · El grafo ya está en todas partes *(puente hacia los casos, 0:45)*
+### 22 · El grafo ya está en todas partes *(puente hacia los casos, 0:45)*
 **Diagrama:** tres tarjetas en fila, cada una con un mini-grafo de 3 nodos y su "dónde vive el grafo". Abajo, una tarjeta ancha resaltada para salud (HL7) y la banda verde con el mensaje. No hacer capturas de las herramientas: logo textual y una línea.
 | Dónde | Ejemplos | Qué parte del grafo resuelven |
 |---|---|---|
@@ -302,7 +318,7 @@ DESPUÉS  Labs ────────┐
 - Tiempo: 45 s. Señalar las tres tarjetas en una frase cada una y detenerse en HL7.
 - Fuentes: LangGraph docs; n8n docs (AI Agent node); Linux Foundation / AAIF (MCP, A2A); HL7 CPG IG STU2; CDS Hooks; HL7 *AI Transparency on FHIR* (2026Jan ballot); HL7, lanzamiento del AI Office (jul. 2025); Velamuri, *Relevance of HL7 FHIR Standards in the Age of Agentic AI*, HL7 News (ene. 2026).
 
-### 22 · Caso 1 · Mount Sinai: un agente vs. un orquestador *(caso principal, 1:30)*
+### 23 · Caso 1 · Mount Sinai: un agente vs. un orquestador *(caso principal, 1:30)*
 **Diagrama (opcional):** a la izquierda, un solo agente desbordado por 80 tareas apiladas, con el número grande **16%**. A la derecha, un orquestador que reparte las tareas en carriles entre agentes especializados, con el número grande **65× menos cómputo**. **No dibujar una curva:** solo hay dos datos publicados y una curva inventaría el resto.
 - **Qué es:** un estudio del Windreich Department of AI and Human Health de Mount Sinai (Nueva York), publicado en *npj Health Systems* el 9 de marzo de 2026: *"Orchestrated multi agents sustain accuracy under clinical scale workloads compared to a single agent"*. Lead author: Eyal Klang; senior author: Girish Nadkarni.
 - **El experimento:** tareas clínicas de recuperación de información, extracción de datos y **cálculo de dosis de medicación**, bajo carga creciente de hasta **80 tareas simultáneas**. Compararon un agente único que hace todo contra un **orquestador que reparte el trabajo entre agentes especializados**.
@@ -316,7 +332,7 @@ DESPUÉS  Labs ────────┐
 - **Tipo de evidencia:** revista con revisión por pares, en condiciones simuladas. El próximo paso declarado es probarlo con datos de pacientes en tiempo real.
 - Frase de Klang: *"Cuando un orquestador divide el trabajo entre agentes especializados, el sistema se mantiene preciso, ágil y mucho más eficiente."*
 
-### 23 · Caso 2 · Microsoft MAI-DxO: un grafo con roles médicos *(1:00)*
+### 24 · Caso 2 · Microsoft MAI-DxO: un grafo con roles médicos *(1:00)*
 **Diagrama:** mapeo en dos columnas unidas por líneas. A la izquierda, los roles médicos (Dr. Hypothesis, Dr. Test-Chooser, Dr. Challenger, Dr. Stewardship, Dr. Checklist). A la derecha, la pieza del grafo con su forma: supervisor, worker, rombo verificador, presupuesto del ciclo y compuerta. Muestra sin explicarlo que todo lo que vimos ya existe en medicina.
 - **Qué es:** *MAI Diagnostic Orchestrator* (Microsoft AI, jun. 2025; paper *Sequential Diagnosis with Language Models*). Resuelve casos clínicos **paso a paso**: pregunta, pide estudios y propone diagnóstico.
 - **El grafo (diagrama del panel):** el mismo modelo juega cinco roles:
@@ -333,7 +349,7 @@ DESPUÉS  Labs ────────┐
   - **No está aprobado para uso clínico.**
 - Mensaje: **la mejora vino del diseño del grafo (roles, verificador, presupuesto), no de un modelo nuevo.** Es el mismo argumento del +13.7 de LangChain, ahora en medicina.
 
-### 24 · Lecciones aprendidas *(0:30)*
+### 25 · Lecciones aprendidas *(0:30)*
 1. **Empezá con un loop.** Dibujá el grafo cuando las dependencias te obliguen.
 2. **Cortá las aristas falsas. Lo que puede ser código, que sea código.**
 3. **Construí el verificador primero**, con contexto limpio y anclas reales.
@@ -342,9 +358,9 @@ DESPUÉS  Labs ────────┐
 
 ---
 
-## Cierre (23:25 → 24:30)
+## Cierre (23:55 → 25:00)
 
-### 25 · Checklist para llevarse
+### 26 · Checklist para llevarse
 Antes de dibujar un grafo:
 1. ¿Puedo nombrar el dato que cruza cada arista?
 2. ¿Qué nodos son código y cuáles necesitan un modelo?
@@ -352,7 +368,7 @@ Antes de dibujar un grafo:
 4. ¿Qué pasa cuando falla cada nodo? ¿Puedo reconstruir una corrida desde la traza?
 5. ¿Dónde decide un humano y qué carril no se abre nunca?
 
-### 26 · Cierre + CTA
+### 27 · Cierre + CTA
 - Volver al gancho: **"Funcionó en local" es donde termina la demo. Predecible, observable y escalable es donde empieza el sistema.**
 - Resumen en tres verbos: **Contener. Converger. Repartir.**
 - Contacto, LinkedIn y QR a las referencias. Abrir preguntas en el chat.
@@ -389,7 +405,14 @@ Antes de dibujar un grafo:
 - Malewicz, G. et al., *Pregel: A System for Large-Scale Graph Processing*, SIGMOD (2010)
 - LangGraph, documentación oficial (inspiración en Pregel y Apache Beam): https://reference.langchain.com/python/langgraph/
 
-**Herramientas y estándares (slide 21)**
+**Correlación de trazas (slide 20)**
+- W3C, *Trace Context* (Recomendación): https://www.w3.org/TR/trace-context/
+- MCP, *SEP-414: Document OpenTelemetry Trace Context Propagation Conventions* (Final): https://modelcontextprotocol.io/seps/414-request-meta
+- Openlayer, *A2A protocol* (propagación de `traceparent` por HTTP entre agentes): https://openlayer.com/docs/integrations/a2a-protocol
+- IHE ITI, *Basic Audit Log Patterns (BALP)*: https://profiles.ihe.net/ITI/BALP/
+- eHealth Suisse, *CH EPR FHIR: Trace Context* (traceparent en AuditEvent): https://fhir.ch/ig/ch-epr-fhir/tracecontext.html
+
+**Herramientas y estándares (slide 22)**
 - LangGraph, documentación oficial: https://reference.langchain.com/python/langgraph/
 - n8n, *AI Agent node*: https://docs.n8n.io · Make: https://www.make.com
 - Linux Foundation, Agentic AI Foundation (MCP, dic. 2025; A2A, ago. 2026): https://axios.com/2026/08/17/a2a-agentic-ai-foundation-open-ai-standards
@@ -410,9 +433,10 @@ Antes de dibujar un grafo:
 
 ## Plan B de tiempos (si vas atrasado)
 - Slide 9: nombrar solo Euler, el algoritmo clínico y el río Pregel (−20 s).
-- Slide 21: nombrar las tres tarjetas en una frase y quedarse solo con AI Transparency de HL7 (−20 s).
+- Slide 22: nombrar las tres tarjetas en una frase y quedarse solo con AI Transparency de HL7 (−20 s).
+- Slide 20: mostrar el header y los saltos rojos, sin el AuditEvent (−15 s).
 - Slide 12: nombrar los 4 tipos de nodo y saltear el contrato (−30 s).
 - Slide 18: desarrollar solo 3 de las 5 fallas (−45 s).
 - Slide 19: nombrar los tres usos de la traza y el audit trail, sin la lista de métricas (−30 s).
-- Slide 23: mostrar el diagrama del panel MAI-DxO y nombrar los roles sin desarrollarlos (−20 s).
-- Slide 24: quedarse con las lecciones 3, 4 y 5 (−15 s).
+- Slide 24: mostrar el diagrama del panel MAI-DxO y nombrar los roles sin desarrollarlos (−20 s).
+- Slide 25: quedarse con las lecciones 3, 4 y 5 (−15 s).
