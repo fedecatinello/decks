@@ -218,6 +218,7 @@ DESPUÉS  Labs ────────┐
 - Los modelos se pierden la mayoría de sus propios errores. **Quien hizo el trabajo no lo verifica.**
 - El verificador tiene **contexto limpio**. Si comparte el chat del worker, no verifica: asiente.
 - Necesita **anclas**: señales que no se pueden discutir, como un test que corrió o un dato que coincide con la fuente. En salud, que la cita apunte al registro real de la HC.
+- Analogía: el ancla es el **tótem de Inception** (el trompo de DiCaprio). Sirve para distinguir lo real de lo soñado: el contenido empírico y evidenciable de lo que generó el modelo.
 - *"Un loop con un verificador real le gana a un grafo sin ninguno."* (AI Builder Club)
 
 ### 18 · Control de errores → *falla local, no sistémica*

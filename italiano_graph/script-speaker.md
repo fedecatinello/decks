@@ -184,6 +184,8 @@ Tres reglas: cada nodo recibe el estado mínimo que necesita; después de los no
 
 *[señalar la escena verde]* El verificador necesita dos cosas: **contexto limpio** y un **ancla**, una señal que no se pueda discutir. En software, un test que corrió de verdad. En salud, que cada afirmación apunte a un registro real de la historia clínica, no a algo que el modelo 'recuerda'.
 
+*[señalar el trompo]* Piensen en el tótem de *Inception*, el trompo de DiCaprio: si sigue girando, estás soñando; si cae, estás en la realidad. El ancla cumple ese rol: separa lo empírico, lo que se puede evidenciar, de lo que el modelo generó.
+
 Y una frase que resume esto: *'un loop con un verificador real le gana a un grafo sin ninguno'*."
 
 ### Slide 18 · Control de errores — 15:35 → 16:40
