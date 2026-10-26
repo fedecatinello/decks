@@ -26,6 +26,15 @@
       .replace(/>/g, "&gt;");
   }
 
+  function logoSrc(slug) {
+    return esc(`img/logos/${slug}${slug.includes(".") ? "" : ".svg"}`);
+  }
+
+  function initials(name) {
+    const words = name.split(/\s+/);
+    return (words.length > 1 ? words.map((w) => w[0]).join("") : name).slice(0, 2);
+  }
+
   function rays() {
     let html = '<div class="rays" aria-hidden="true">';
     for (let i = 0; i < 14; i++) {
@@ -135,7 +144,7 @@
         : `<div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/${esc(s.video)}?rel=0" title="${esc(s.title)}" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
       main = `<h2 class="figure-title">${esc(s.title)}</h2><p class="sub" style="color:var(--muted)">${esc(s.sub)}</p>${player}<p class="video-link"><a href="${watch}" target="_blank" rel="noopener">Abrir en YouTube</a></p>`;
     } else if (s.layout === "media") {
-      main = `<div class="media"><figure><img src="${esc(s.image)}" alt="${esc(s.alt)}"><figcaption>${esc(s.credit)}</figcaption></figure><div><h2>${esc(s.title)}</h2><div class="choices">${s.points
+      main = `<div class="media${s.contain ? " media--contain" : ""}"><figure><img src="${esc(s.image)}" alt="${esc(s.alt)}"><figcaption>${esc(s.credit)}</figcaption></figure><div><h2>${esc(s.title)}</h2><div class="choices">${s.points
         .map(([t, p]) => `<article class="choice"><h3>${esc(t)}</h3><p>${esc(p)}</p></article>`)
         .join("")}</div></div></div>`;
     } else if (s.layout === "cards") {
@@ -151,7 +160,7 @@
       main = `<h2>${esc(s.title)}</h2><div style="height:16px"></div><table class="matrix"><thead><tr>${s.headers
         .map((h) => `<th>${esc(h)}</th>`)
         .join("")}</tr></thead><tbody>${s.rows
-        .map((r) => `<tr>${r.map((c) => `<td>${esc(c)}</td>`).join("")}</tr>`)
+        .map((r, ri) => `<tr>${r.map((c, ci) => `<td>${ci === 0 && s.dots ? `<i class="tdot tdot-${ri}"></i>` : ""}${esc(c)}</td>`).join("")}</tr>`)
         .join("")}</tbody></table><p class="muted" style="margin-top:10px">${esc(s.note)}</p>`;
     } else if (s.layout === "compare") {
       main = `<h2>${esc(s.title)}</h2><div style="height:16px"></div><div class="compare">${s.columns
@@ -239,6 +248,96 @@
       main = `<h2 class="figure-title">${esc(s.title)}</h2><div class="explore"><div class="explore-stack">${s.parts
         .map(([name, tools], i) => `<button type="button" class="ex-layer${state.part === i ? " is-on" : ""}" data-part="${i}"><b>${esc(name)}</b><span>${esc(tools)}</span></button>`)
         .join("")}</div><aside class="explore-detail"><span class="kicker">${esc(cur[0])}</span><p>${esc(cur[2])}</p></aside></div>`;
+    } else if (s.layout === "photo") {
+      main = `<div class="photo-text"><h2>${esc(s.title)}</h2>${s.sub ? `<p class="sub">${esc(s.sub)}</p>` : ""}</div>`;
+    } else if (s.layout === "logos") {
+      const tile = ([slug, name]) =>
+        `<div class="logo-tile">${slug ? `<img src="${logoSrc(slug)}" alt="">` : `<span class="logo-mono">${esc(initials(name))}</span>`}<span>${esc(name)}</span></div>`;
+      main = `<h2 class="figure-title">${esc(s.title)}</h2><div class="logo-groups">${s.groups
+        .map(([label, items]) => `<section class="logo-group"><h3>${esc(label)}</h3><div class="logo-row">${items.map(tile).join("")}</div></section>`)
+        .join("")}</div>${s.note ? `<p class="muted" style="margin-top:10px">${esc(s.note)}</p>` : ""}`;
+    } else if (s.layout === "cases") {
+      main = `<h2 class="figure-title">${esc(s.title)}</h2><div class="cases">${s.cases
+        .map(([slug, name, what, text]) => `<article class="case"><header>${slug ? `<img src="${logoSrc(slug)}" alt="">` : `<span class="logo-mono">${esc(initials(name))}</span>`}<div><strong>${esc(name)}</strong><span class="kicker">${esc(what)}</span></div></header><p>${esc(text)}</p></article>`)
+        .join("")}</div>`;
+    } else if (s.layout === "spotify") {
+      const key = s.parts[state.part][0];
+      const roles = ["be", "fe", "qa", "po"];
+      const tribe = (t) => `<section class="sp-tribe${key === "tribe" && t === 0 ? " is-on" : ""}"><header>Tribe ${t === 0 ? "Pagos" : "Música"}${key === "chapter" && t === 0 ? ' <b class="sp-tag">· Chapter Backend</b>' : ""}</header><div class="sp-squads">${[0, 1, 2]
+        .map((q) => `<div class="sp-squad${key === "squad" && t === 0 && q === 0 ? " is-on" : ""}"><span class="sp-label">Squad</span>${roles
+          .map((r) => {
+            const on = (key === "chapter" && t === 0 && r === "be") || (key === "guild" && r === "fe") || (key === "squad" && t === 0 && q === 0) || (key === "tribe" && t === 0);
+            return `<i class="sp-dot sp-${r}${on ? " is-on" : ""}"></i>`;
+          })
+          .join("")}</div>`)
+        .join("")}</div>${key === "chapter" && t === 0 ? '<div class="sp-band"></div>' : ""}</section>`;
+      main = `<h2 class="figure-title">${esc(s.title)}</h2><div class="sp"><div class="sp-diagram${key === "guild" ? " guild-on" : ""}">${tribe(0)}${tribe(1)}${key === "guild" ? '<div class="sp-guild">Guild Frontend · cruza tribes, voluntaria</div>' : ""}<div class="sp-legend"><span><i class="sp-dot sp-be"></i>Backend</span><span><i class="sp-dot sp-fe"></i>Frontend</span><span><i class="sp-dot sp-qa"></i>QA</span><span><i class="sp-dot sp-po"></i>Product owner</span></div></div><div><div class="slo-targets" style="margin-top:0">${s.parts
+        .map(([, name], i) => `<button type="button" class="part${state.part === i ? " is-on" : ""}" data-part="${i}">${esc(name)}</button>`)
+        .join("")}</div><p class="detail">${esc(s.parts[state.part][2])}</p></div></div>`;
+    } else if (s.layout === "chart") {
+      const c = s.chart;
+      const W = 640, H = 340, L = 54, R = 120, T = 16, B = 44;
+      const n = c.x.length;
+      const yMax = c.yMax || Math.max(...c.series.flatMap((se) => se.data));
+      const px = (i) => L + (i / (n - 1)) * (W - L - R);
+      const py = (v) => T + (1 - v / yMax) * (H - T - B);
+      const grid = [0, 0.25, 0.5, 0.75, 1]
+        .map((f) => `<line x1="${L}" x2="${W - R}" y1="${py(f * yMax)}" y2="${py(f * yMax)}" class="ch-grid"/><text x="${L - 8}" y="${py(f * yMax) + 4}" class="ch-y">${esc(c.yFormat ? c.yFormat.replace("{}", Math.round(f * yMax)) : Math.round(f * yMax))}</text>`)
+        .join("");
+      const xs = c.x.map((label, i) => (label ? `<text x="${px(i)}" y="${H - B + 20}" class="ch-x">${esc(label)}</text>` : "")).join("");
+      const lines = c.series
+        .map((se) => {
+          const pts = se.data.map((v, i) => (v === null ? null : [px(i), py(Math.max(0, v))])).filter(Boolean);
+          const last = se.labelAt !== undefined ? [px(se.labelAt), py(se.data[se.labelAt])] : pts[pts.length - 1];
+          const label = c.legend ? "" : `<text x="${last[0] + 8}" y="${last[1] + 4}" class="ch-label tone-${se.tone}">${esc(se.name)}</text>`;
+          return `<polyline points="${pts.map((q) => q.join(",")).join(" ")}" class="ch-line tone-${se.tone}${se.dash ? " dash" : ""}"/>${label}`;
+        })
+        .join("");
+      const marks = (c.marks || []).map(([v, label]) => `<line x1="${L}" x2="${W - R}" y1="${py(v)}" y2="${py(v)}" class="ch-mark"/><text x="${W - R + 8}" y="${py(v) + 4}" class="ch-marklabel">${esc(label)}</text>`).join("");
+      const svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(c.aria || s.title)}">${grid}${marks}${lines}${xs}<text x="${(L + W - R) / 2}" y="${H - 4}" class="ch-axis">${esc(c.xLabel || "")}</text></svg>`;
+      main = `<h2 class="figure-title">${esc(s.title)}</h2><div class="chart-wrap${s.dark ? " is-dark" : ""}"><figure class="chart-fig">${svg}${c.legend ? `<figcaption class="ch-legend">${c.series.map((se) => `<span class="tone-${se.tone}"><i></i>${esc(se.name)}</span>`).join("")}</figcaption>` : ""}</figure><div class="choices">${s.points
+        .map(([t, p]) => `<article class="choice"><h3>${esc(t)}</h3><p>${esc(p)}</p></article>`)
+        .join("")}</div></div>`;
+    } else if (s.layout === "budget") {
+      main = `<h2>${esc(s.title)}</h2><div class="budget"><div class="budget-bar"><span class="budget-good">${esc(s.good)}</span><span class="budget-bad"></span></div><div class="budget-zoom"><span class="budget-tag">${esc(s.zoom)}</span></div></div>${cardsHtml(s.cards)}`;
+    } else if (s.layout === "fraction") {
+      main = `<h2 class="figure-title">${esc(s.title)}</h2><div class="fraction-wrap"><div class="fraction"><span>${esc(s.top)}</span><i></i><span>${esc(s.bottom)}</span></div><div class="choices">${s.choices
+        .map(([t, p]) => `<article class="choice"><h3>${esc(t)}</h3><p>${esc(p)}</p></article>`)
+        .join("")}</div></div>`;
+    } else if (s.layout === "load") {
+      main = `<h2 class="figure-title">${esc(s.title)}</h2><div class="load"><div class="load-pack">${s.boxes
+        .map(([t, p]) => `<div class="load-box"><b>${esc(t)}</b><span>${esc(p)}</span></div>`)
+        .join("")}</div><div class="load-types">${s.types
+        .map(([t, p, cls, w]) => `<div class="load-type ${cls}"><div class="load-meter"><i style="width:${w}%"></i></div><b>${esc(t)}</b><span>${esc(p)}</span></div>`)
+        .join("")}</div></div>`;
+    } else if (s.layout === "topologies") {
+      main = `<h2 class="figure-title">${esc(s.title)}</h2><div class="topo">${s.teams
+        .map(([cls, t, p]) => `<div class="topo-row"><span class="topo-shape ${cls}"></span><div><h3>${esc(t)}</h3><p>${esc(p)}</p></div></div>`)
+        .join("")}</div>${s.foot ? `<p class="topo-foot">${esc(s.foot)}</p>` : ""}`;
+    } else if (s.layout === "factory") {
+      main = `<h2 class="figure-title">${esc(s.title)}</h2><div class="factory"><div class="factory-flow"><div class="factory-src">${esc(s.source)}</div><i class="factory-arrow"></i><div class="factory-pkg"><header>${esc(s.target)}</header><div class="factory-items">${s.items
+        .map((it) => `<span>${esc(it)}</span>`)
+        .join("")}</div></div></div><div class="choices">${s.points
+        .map(([t, p]) => `<article class="choice"><h3>${esc(t)}</h3><p>${esc(p)}</p></article>`)
+        .join("")}</div></div>`;
+    } else if (s.layout === "pr") {
+      const icon = { ok: "✓", fail: "✕", warn: "!" };
+      main = `<h2 class="figure-title">${esc(s.title)}</h2><div class="pr-wrap"><div class="pr"><header><span class="pr-state">Open</span><b>${esc(s.pr)}</b></header><ul>${s.checks
+        .map(([st, name, detail]) => `<li class="pr-${st}"><i>${icon[st]}</i><b>${esc(name)}</b><span>${esc(detail)}</span></li>`)
+        .join("")}</ul><footer>${esc(s.verdict)}</footer></div><div class="choices">${s.points
+        .map(([t, p]) => `<article class="choice"><h3>${esc(t)}</h3><p>${esc(p)}</p></article>`)
+        .join("")}</div></div>`;
+    } else if (s.layout === "canary") {
+      const st = s.steps[state.part];
+      main = `<h2 class="figure-title">${esc(s.title)}</h2><div class="slo-targets">${s.steps
+        .map(([label], i) => `<button type="button" class="part${state.part === i ? " is-on" : ""}" data-part="${i}">${esc(label)}</button>`)
+        .join("")}</div><div class="canary${st[3] ? " is-bad" : ""}"><div class="canary-bar"><span class="canary-v1" style="width:${100 - st[1]}%">${100 - st[1] >= 12 ? `v1 · ${100 - st[1]}%` : ""}</span><span class="canary-v2" style="width:${st[1]}%">${st[1] >= 12 ? `v2 · ${st[1]}%` : ""}</span></div><div class="canary-sli"><span class="kicker">SLI de la versión nueva</span><strong>${esc(st[2])}</strong></div></div><p class="detail">${esc(st[4])}</p>`;
+    } else if (s.layout === "codeshot") {
+      const lines = s.code
+        .map((line) => esc(line).replace(/^(\s*(?:- )?)([\w-]+:)/, '$1<span class="k">$2</span>'))
+        .join("\n");
+      const steps = s.steps ? `<div class="steps">${s.steps.map((x) => `<span>${esc(x)}</span>`).join('<i aria-hidden="true">→</i>')}</div>` : "";
+      main = `<h2 class="figure-title">${esc(s.title)}</h2>${steps}<div class="codeshot"><pre class="yaml">${lines}</pre><figure><img src="${esc(s.image)}" alt="${esc(s.alt)}"><figcaption>${esc(s.credit)}</figcaption>${s.points ? `<ul class="codeshot-points">${s.points.map(([t, p]) => `<li><b>${esc(t)}</b> ${esc(p)}</li>`).join("")}</ul>` : ""}</figure></div>`;
     } else if (s.layout === "beats") {
       const b = s.beats[state.beat];
       const pods = (list) =>
@@ -266,22 +365,24 @@
         .join("")}</div>`;
     } else if (s.layout === "yaml") {
       const lines = s.code
-        .map((line) => esc(line).replace(/^(\s*)([\w-]+:)/, '$1<span class="k">$2</span>'))
+        .map((line) => esc(line).replace(/^(\s*(?:- )?)([\w-]+:)/, '$1<span class="k">$2</span>'))
         .join("\n");
       main = `<h2>${esc(s.title)}</h2><pre class="yaml" style="margin-top:16px">${lines}</pre>`;
     }
 
-    const dark = s.layout === "title" || s.layout === "close" || s.layout === "dark-cards";
-    return `<section class="slide${dark ? " slide--dark" : ""}">${dark ? rays() : ""}<header class="topbar"><span class="kicker">${esc(s.kicker)}</span><span class="muted">${esc(m.unit)}</span></header><div class="body">${main}</div><footer class="footer"><span>${n} / ${String(total).padStart(2, "0")}</span><span><button type="button" data-action="index">Índice</button> · <button type="button" data-action="notes">${state.notes ? "Ocultar notas" : "Notas"}</button> · <button type="button" data-action="home">Inicio</button></span></footer></section>${
+    const photo = s.layout === "photo";
+    const dark = photo || s.dark || s.layout === "title" || s.layout === "close" || s.layout === "dark-cards";
+    const bg = photo ? `<img class="photo-bg" src="${esc(s.image)}" alt="${esc(s.alt || "")}"><div class="photo-scrim"></div>${s.credit ? `<span class="photo-credit">${esc(s.credit)}</span>` : ""}` : dark && !s.dark ? rays() : "";
+    return `<section class="slide${dark ? " slide--dark" : ""}${photo ? " slide--photo" : ""}">${bg}<header class="topbar"><span class="kicker">${esc(s.kicker)}</span><span class="muted">${esc(m.unit)}</span></header><div class="body">${main}</div><footer class="footer"><span>${n} / ${String(total).padStart(2, "0")}</span><span><button type="button" data-action="index">Índice</button> · <button type="button" data-action="notes">${state.notes ? "Ocultar notas" : "Notas"}</button> · <button type="button" data-action="home">Inicio</button></span></footer></section>${
       state.notes ? `<aside class="notes"><span class="stamp">Nota del docente</span><p>${esc(s.notes)}</p></aside>` : ""
     }`;
   }
 
   function renderHome() {
-    app.innerHTML = `<main class="home">${rays()}<div><p class="stamp">${esc(deck.course)}</p><h1>${esc(deck.unit)}</h1><p class="lead">${esc(deck.lead)}</p></div><div class="modules">${deck.modules
+    app.innerHTML = `<main class="home">${rays()}<div><p class="stamp">${esc(deck.course)}</p><h1>${esc(deck.unit)}</h1><p class="lead">${esc(deck.lead)}</p></div><div class="modules${deck.modules.length === 1 ? " is-single" : ""}">${deck.modules
       .map(
         (m) =>
-          `<button class="module-card" type="button" data-enter="${m.id}"><span class="stamp">${esc(m.unit)} · ${m.slides.length} pantallas</span><strong>${esc(m.title)}</strong><p>${esc(m.blurb)}</p><span class="go">Empezar →</span></button>`
+          `<button class="module-card" type="button" data-enter="${m.id}"><span class="stamp">${esc(m.unit)} · ${m.slides.length} pantallas</span><strong>${esc(m.title)}</strong><p>${esc(m.blurb)}</p>${m.blocks ? `<ol class="module-blocks">${m.blocks.map((b) => `<li>${esc(b)}</li>`).join("")}</ol>` : ""}<span class="go">Empezar →</span></button>`
       )
       .join("")}</div><div class="keys"><span><b>←</b><b>→</b> avanzar</span><span><b>I</b> índice</span><span><b>N</b> notas</span><span><b>H</b> inicio</span><span><b>?</b> ayuda</span></div></main>`;
   }
