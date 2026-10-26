@@ -55,22 +55,32 @@ function copyDir(src, dst) {
 const humanize = (name) => name.replace(/[_-]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
 // --- recolectar presentaciones ---------------------------------------------
+// Una presentación es la primera carpeta (bajando desde la raíz) que tiene un
+// .html. Las carpetas sin HTML se recorren como agrupadoras (ej. itba/<deck>).
 const decks = [];
-for (const entry of fs.readdirSync(ROOT, { withFileTypes: true })) {
-  if (!entry.isDirectory() || entry.name.startsWith('.') || SKIP_DIRS.has(entry.name)) continue;
-  const dir = path.join(ROOT, entry.name);
-  const htmls = fs.readdirSync(dir).filter((f) => f.toLowerCase().endsWith('.html')).sort();
-  if (htmls.length === 0) continue;
-  const main = htmls.includes('index.html') ? 'index.html' : htmls[0];
-  const meta = readMeta(path.join(dir, main));
-  decks.push({
-    slug: entry.name,
-    main,
-    title: meta.title || humanize(entry.name),
-    description: meta.description || '',
-    date: lastCommitDate(entry.name),
-  });
+function collect(rel) {
+  for (const entry of fs.readdirSync(path.join(ROOT, rel), { withFileTypes: true })) {
+    if (!entry.isDirectory() || entry.name.startsWith('.')) continue;
+    if (!rel && SKIP_DIRS.has(entry.name)) continue;
+    const slug = rel ? `${rel}/${entry.name}` : entry.name;
+    const dir = path.join(ROOT, slug);
+    const htmls = fs.readdirSync(dir).filter((f) => f.toLowerCase().endsWith('.html')).sort();
+    if (htmls.length === 0) {
+      collect(slug);
+      continue;
+    }
+    const main = htmls.includes('index.html') ? 'index.html' : htmls[0];
+    const meta = readMeta(path.join(dir, main));
+    decks.push({
+      slug,
+      main,
+      title: meta.title || humanize(entry.name),
+      description: meta.description || '',
+      date: lastCommitDate(slug),
+    });
+  }
 }
+collect('');
 decks.sort((a, b) => (b.date?.getTime() ?? 0) - (a.date?.getTime() ?? 0) || a.title.localeCompare(b.title));
 
 // --- generar dist/ ----------------------------------------------------------
